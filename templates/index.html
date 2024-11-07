@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>动漫风格转换</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+        }
+        .preview {
+            max-width: 100%;
+            margin: 20px 0;
+        }
+        #loading {
+            display: none;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>动漫风格转换</h1>
+        <form id="uploadForm">
+            <input type="file" name="image" accept="image/*" required>
+            <button type="submit">转换</button>
+        </form>
+        <div id="loading">处理中...</div>
+        <img id="preview" class="preview" style="display: none;">
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const loading = document.getElementById('loading');
+        const preview = document.getElementById('preview');
+
+        form.onsubmit = async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            loading.style.display = 'block';
+            preview.style.display = 'none';
+
+            try {
+                const response = await fetch('/convert', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    preview.src = URL.createObjectURL(blob);
+                    preview.style.display = 'block';
+                } else {
+                    const error = await response.text();
+                    alert('转换失败: ' + error);
+                }
+            } catch (error) {
+                alert('请求失败: ' + error);
+            } finally {
+                loading.style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html>
